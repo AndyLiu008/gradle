@@ -1,0 +1,157 @@
+apply plugin: 'com.android.application'
+
+
+
+android {
+
+    //flavorDimensions "color"
+    compileSdkVersion 22
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.example.myapplication1"
+        minSdkVersion 19
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+    signingConfigs {
+        //staging.initWith(signingConfigs.debug)
+
+        /*       release{
+                   storeFile file("F:\\signe\\stone.keystore")
+                   storePassword"secretpassword"
+                   keyAlias "gradleforandroid"
+                   keyPassword "secretpassword"
+               }*/
+
+
+        releaseConfig{
+            storeFile file("F:\\signe\\app.keystore")
+            storePassword "key123"
+//            if(System.console() != null)
+//                System.console().readLine("\nKeystore password: ")
+            keyAlias "alias_name"
+            keyPassword "key123"
+//            if(System.console() != null)
+//                System.console().readLine("\nKey password: ")
+        }
+
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.releaseConfig
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+    }
+
+
+
+
+//    productFlavors {
+//        red {
+//            //flavorDimension "color"
+//        }
+//
+//        blue {
+//           // flavorDimension "color"
+//        }
+//    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+}
+
+
+printDirandId()
+
+
+
+tasks.getByName("build"){
+
+    it.doFirst{
+        println "$project.name: begin to do assemble"
+
+    }
+
+//    it.doLast{
+//        println "$project.name: end of doing assemble"
+//        println rootProject.getRootDir().getAbsolutePath()
+//        copyFile(rootProject.getRootDir().getAbsolutePath()+"\\build\\outputs\\apk\\app-debug.apk","F:\\signe\\3288.apk")
+//    }
+
+    it.doLast{
+        println "$project.name: end of doing app:build"
+
+        println rootProject.getRootDir().getAbsolutePath()
+        copyFile(rootProject.getRootDir().getAbsolutePath()+"\\app\\build\\outputs\\apk\\app-debug.apk","F:\\signe\\unsignedpack\\treefrog_3288.apk")
+
+        // copyFile(rootProject.getRootDir().getAbsolutePath()+"/app/build/outputs/apk/app-debug.apk","F:\\signe\\unsignedpack\\treefrog_3288.apk")
+
+
+
+        // Process p = Runtime.getRuntime().exec("cmd.exe /c start F:/signe/aa.bat");
+        Process p = Runtime.getRuntime().exec("cmd.exe /c start F:/signe/系统签名3288/系统签名.bat");
+
+        Process p1 = Runtime.getRuntime().exec("cmd.exe /c start F:/signe/系统签名3288/install.bat");
+
+
+        //gradle gitReversion
+
+
+//        new ByteArrayOutputStream().withStream { os ->
+//            def result = exec {
+//                executable = 'date'
+//            }
+//            ext.whoami = os.toString()
+//        }
+
+        //println whoami
+
+        //Runtime.getRuntime().exec("date");
+
+    }
+}
+
+tasks.getByName("clean"){
+
+    it.doFirst{
+        println "$project.name: begin to do clean"
+
+    }
+
+    it.doLast{
+        println "$project.name: end of doing clean"
+    }
+}
+
+tasks.getByName("lint"){
+
+    it.doFirst{
+        println "$project.name: begin to do lint"
+
+    }
+
+    it.doLast{
+        println "$project.name: end of doing lint"
+    }
+}
+
+
+tasks.getByName("preBuild"){
+
+    it.doFirst{
+        println "$project.name: begin to do preBuild"
+
+    }
+
+    it.doLast{
+        println "$project.name: end of doing preBuild"
+    }
+}

@@ -1,0 +1,32 @@
+/*根据 Project、Gradle 生命周期的介绍，settings 对象的创建位于具体 Project 创建之前
+而 Gradle 底对象已经创建好了。所以，我们把 local.properties 的信息读出来后，通过
+extra 属性的方式设置到 gradle 对象中
+而具体 Project 在执行的时候，就可以直接从 gradle 对象中得到这些属性了！*/
+
+//定义一个名为 initGradleEnvironment 的函数。该函数内部完成一些初始化操作
+//比如创建特定的目录，设置特定的参数等
+def initGradleEnvironment(){
+    println "initialize  Gradle Environment ....."
+    //......//干一些 special 的私活....
+
+    Properties properties = new Properties()
+
+    File propertyFile = new File(rootDir.getAbsolutePath() + "/local.properties")
+
+    properties.load(propertyFile.newDataInputStream())
+
+    gradle.ext.api = properties.getProperty('sdk.api')
+    gradle.ext.sdkDir = properties.getProperty('sdk.dir')
+    gradle.ext.ndkDir = properties.getProperty('ndk.dir')
+    gradle.ext.localDir = properties.getProperty('local.dir')
+//指定 debug keystore 文件的位置，debug 版 apk 签名的时候会用到
+    gradle.ext.debugKeystore = properties.getProperty('debug.keystore')
+
+    //println "gradle.api="+ gradle.api //再次存取 api 的时候，就不需要 ext 前缀了
+
+    println "initialize  Gradle Environment completes..."
+}
+initGradleEnvironment()
+
+
+include ':app'

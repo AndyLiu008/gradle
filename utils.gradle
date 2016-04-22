@@ -1,0 +1,75 @@
+//utils.gradle 中定义了一个获取 AndroidManifests.xml versionName 的函数
+//解析 XML 时候要引入这个 groovy 的 package
+
+def copyFile(String srcFile1,dstFile1){
+   // ......//拷贝文件函数，用于将最后的生成物拷贝到指定的目录
+
+    def srcFile = new File(srcFile1)
+    def targetFile = new File(dstFile1)
+    targetFile.withOutputStream{ os->
+        srcFile.withInputStream{ ins->
+            os << ins //利用 OutputStream 的<<操作符重载，
+            // 完成从 inputstream 到 OutputStream的输出
+        }
+    }
+}
+
+def rmFile(String targetFile){
+   // .....//删除指定目录中的文件
+}
+def cleanOutput(boolean bJar = true){
+    //....//clean 的时候清理
+}
+def copyOutput(boolean bJar = true){
+   // ....//copyOutput 内部会调用 copyFile 完成一次 build 的产出物拷贝
+}
+
+
+//对于 android library 编译，我会 disable 所有的 debug 编译任务
+def disableDebugBuild(){
+//project.tasks 包含了所有的 tasks，下面的 findAll 是寻找那些名字中带 debug 的 Task。
+//返回值保存到 targetTasks 容器中
+    def targetTasks = project.tasks.findAll{task ->
+        task.name.contains("Debug")
+    }
+//对满足条件的 task，设置它为 disable。如此这般，这个 Task 就不会被执行
+    targetTasks.each{
+        println "disable debug task : ${it.name}"
+        it.setEnabled false
+    }
+}
+def getVersionNameAdvanced(){
+    //下面这行代码中的 project 是谁？
+    def xmlFile = project.file("AndroidManifest.xml")
+    def rootManifest = new XmlSlurper().parse(xmlFile)
+    return rootManifest['@android:versionName']
+}
+
+def printDirandId(){
+    println "setting, gradle id is " + gradle.hashCode()
+    println "Home Dir:" + gradle.gradleHomeDir
+
+    println "User Home Dir:" + gradle.gradleUserHomeDir
+    println "Parent: " + gradle.parent
+
+    println "gradle.api="+ gradle.api
+
+    println "gradle.ndkDir="+ gradle.ndkDir
+}
+
+//现在，想把这个 API 输出到各个 Project。由于这个 utils.gradle 会被每一个 Project Apply，所以
+//我可以把 getVersionNameAdvanced 定义成一个 closure，然后赋值到一个外部属性
+//下面的 ext 是谁的 ext？
+
+ext{ //此段花括号中代码是闭包
+//除了 ext.xxx=value 这种定义方法外，还可以使用 ext{}这种书写方法。
+//ext{}不是 ext(Closure)对应的函数调用。但是 ext{}中的{}确实是闭包。
+
+    printDirandId = this.&printDirandId
+    copyFile = this.&copyFile
+    rmFile = this.&rmFile
+    cleanOutput = this.&cleanOutput
+    copyOutput = this.&copyOutput
+    getVersionNameAdvanced = this.&getVersionNameAdvanced
+    disableDebugBuild = this.&disableDebugBuild
+}
